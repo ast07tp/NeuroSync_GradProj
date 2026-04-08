@@ -37,7 +37,8 @@ for gid in range(len(mapping_result)):
     gid_to_chipid[gid] = len(gid_list_per_chip[mapping_result[gid]])    
     gid_list_per_chip[mapping_result[gid]].append(gid)
 
-np.save(workload + "/gids_per_chip.npy", gid_list_per_chip)
+# np.save(workload + "/gids_per_chip.npy", gid_list_per_chip)
+np.save(workload + "/gids_per_chip.npy", np.array(gid_list_per_chip, dtype=object), allow_pickle=True)
 
 neu_per_core = [len(gid_list_per_chip[chip]) for chip in range(num_chip)]
 #
