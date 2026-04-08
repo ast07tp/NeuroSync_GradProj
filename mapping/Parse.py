@@ -42,4 +42,5 @@ num_neu = 0
 for ind in neu_ind:
     num_neu += len(ind)
 
-np.savez(workload_name + "/mapping_" + str(num_neu) + "_" + str(used_core_num) + ".npz", node_list = node_list)
+# np.savez(workload_name + "/mapping_" + str(num_neu) + "_" + str(used_core_num) + ".npz", node_list = node_list)
+np.savez(workload_name + "/mapping_" + str(num_neu) + "_" + str(used_core_num) + ".npz", node_list = np.array(node_list, dtype=object))
