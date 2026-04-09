@@ -63,6 +63,7 @@ for param in param_set:
     max_timestep = param[6]
     pretrace_engine = param[7]
 
+    # @@ sim result folder
     folder_name = workload_name + "_" + \
                   "peri" + str(sync_period) + "_" + \
                   str(pretrace_engine) + "pretrace_eng"
@@ -151,12 +152,28 @@ for param in param_set:
 
     # execute
     # proc = subprocess.Popen(['python3 Main.py ' + argument]\
+    # command = 'python3 Main.py ' + argument + ' > log 2> err&'
+    # f = open(working_directory + folder_name + "/command.sh", "w")
+    # f.write(command)
+    # f.close()
+    # proc = subprocess.Popen([command],
+    #                         close_fds=True, shell=True, cwd=working_directory + folder_name)
+    # out, err = proc.communicate()
+
+    # time.sleep(1)
+
     command = 'python3 Main.py ' + argument + ' > log 2> err&'
     f = open(working_directory + folder_name + "/command.sh", "w")
     f.write(command)
     f.close()
-    proc = subprocess.Popen([command],
-                            close_fds=True, shell=True, cwd=working_directory + folder_name)
-    out, err = proc.communicate()
+
+    log_file = open(working_directory + folder_name + '/log', 'w')
+    err_file = open(working_directory + folder_name + '/err', 'w')
+    proc = subprocess.Popen(
+        ['python3', 'Main.py'] + argument.split(),
+        stdout=log_file,
+        stderr=err_file,
+        cwd=working_directory + folder_name
+    )
 
     time.sleep(1)
