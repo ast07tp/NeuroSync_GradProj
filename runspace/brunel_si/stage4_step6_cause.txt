@@ -1,0 +1,31 @@
+코어 뉴런수: mean=64.1 min=63 max=65 (timestep 은 코어당 1개=GV.timestep[ind], 이 ~64뉴런이 함께 전진/stall)
+
+[T=128] A2 (per-TIMESTEP=실제 advance 단위; 코어 timestep 공유):
+  belated 발생한 (코어,ts) 셀당 victim 뉴런 = mean 7.5 / median 6  (코어 ~64뉴런 중) → 대다수는 그 ts belated 無
+  → victim 1뉴런 보호 위해 코어 전체 stall 시 **헛정지 동료 = mean 12.1 / median 10 뉴런**
+  전체 손익비(헛정지 뉴런-ts 2,087,591 : 보호 victim 277,880) = **7.5 : 1**  (≫1 → 공유 timestep 이 A2 결정적 손해)
+  (참고) 코어가 belated 만나는 ts 빈도 = 30.0% → 이만큼 코어 전체가 강제 stall(= 사실상 T 붕괴, Stage3 열위)
+[T=128] B (블록 belated 발생 분리 AUC; 0.5=무작위, 1=완벽):
+  causal: last-block=0.533 EWMA=0.555 (≈0.5=무작위)  | static-rate(CHEAT,전구간평균)=0.654 (약함)
+  → 실현(causal) 예측기는 사실상 무작위, *미래를 컨닝한* 정적 link rate 조차 AUC 0.65(약). belated 는 예측기 품질이 아니라 *내재적으로* 거의 예측 불가(맞힐 신호 부재).
+[T=128] A1 전제조건: corr(코어 victim-mass, 코어 source-mass)=+0.099, self-core=1.6%
+  → 양의 상관 = stall 대상(victim) 코어가 동시에 큰 belated *source* → 그 코어 지연이 하류로 전파(A1 전제 성립). 단 실제 재타이밍은 stall 재시뮬 필요(정적 trace 한계).
+
+[T=64] A2 (per-TIMESTEP=실제 advance 단위; 코어 timestep 공유):
+  belated 발생한 (코어,ts) 셀당 victim 뉴런 = mean 7.6 / median 7  (코어 ~64뉴런 중) → 대다수는 그 ts belated 無
+  → victim 1뉴런 보호 위해 코어 전체 stall 시 **헛정지 동료 = mean 11.3 / median 8 뉴런**
+  전체 손익비(헛정지 뉴런-ts 1,969,766 : 보호 victim 266,027) = **7.4 : 1**  (≫1 → 공유 timestep 이 A2 결정적 손해)
+  (참고) 코어가 belated 만나는 ts 빈도 = 28.4% → 이만큼 코어 전체가 강제 stall(= 사실상 T 붕괴, Stage3 열위)
+[T=64] B (블록 belated 발생 분리 AUC; 0.5=무작위, 1=완벽):
+  causal: last-block=0.535 EWMA=0.564 (≈0.5=무작위)  | static-rate(CHEAT,전구간평균)=0.672 (약함)
+  → 실현(causal) 예측기는 사실상 무작위, *미래를 컨닝한* 정적 link rate 조차 AUC 0.67(약). belated 는 예측기 품질이 아니라 *내재적으로* 거의 예측 불가(맞힐 신호 부재).
+[T=64] A1 전제조건: corr(코어 victim-mass, 코어 source-mass)=+0.380, self-core=1.6%
+  → 양의 상관 = stall 대상(victim) 코어가 동시에 큰 belated *source* → 그 코어 지연이 하류로 전파(A1 전제 성립). 단 실제 재타이밍은 stall 재시뮬 필요(정적 trace 한계).
+
+[saved] /home/heechan/26_GRADPROJ/NeuroSync_GradProj/result_img/stage4_cause_diagnosis.png
+
+[STEP6 판정 — 사용자 가설 검증 (정직, 측정값 기반)]
+ · **A2 = 결정적 (사용자 지적이 정확)**: 실제 결정 단위인 per-timestep 에서 한 ts 의 victim 은 코어 ~64뉴런 중 소수(중앙값 수치 위 표 참조)뿐인데, timestep 이 코어 공유(GV.timestep[ind])라 그 소수 위해 코어 전체를 stall → 헛정지:victim 손익비 ≫1. 완벽 belated 예측기여도 *per-core* stall 단위면 구조적으로 패배. (bin=16ts 로 보면 victim 이 뭉쳐 ~40%로 보여 A2 가 과소평가됨 — per-ts 가 올바른 렌즈.)
+ · **B = 동시 성립(보강, 단 '예측기 탓' 아님)**: causal 예측기 AUC≈0.53(무작위), 미래 컨닝한 정적 rate 조차 ~0.65(약). 즉 '우리 predictor 가 못 맞힌다' 보다 정확히는 **belated 가 내재적으로 예측 신호를 안 준다**(Step3 Poisson·Step4 Δt⊥거리와 정합).
+ · **A1 = 전제 성립(사용자 직관 타당), 완전검증은 stall 재시뮬 필요**: corr(코어 victim-mass, source-mass) 양수(T64 +0.38). stall→미래 spike 지연→하류 재-belated 경로 존재. 정적 trace 는 재타이밍 미반영 → Step5 oracle(+18%)은 *과대평가*(실제 더 나쁨).
+ · **종합**: 세 원인이 같은 방향. 사용자 가설(A1+A2)이 핵심 인과 — 특히 **A2(코어 공유 timestep vs per-뉴런 희소 victim)가 결정적**, B 가 그 위에 곱해짐. per-core speculative-advance stall 폐기는 정당. 재정의는 아래 BP 재적용 3안으로.

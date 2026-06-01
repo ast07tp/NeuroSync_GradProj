@@ -1,0 +1,9 @@
+# Stage3 fixed-T sweep (brunel_si v1)  Mon May 18 05:14:15 KST 2026
+# columns: T  final_timestep  final_cumulative_cyc
+1 1970 9891914
+2 1970 5743497
+4 1970 3654443
+8 1970 2602320
+32 1970 1854170
+64 1970 1808130
+128 1970 1909086

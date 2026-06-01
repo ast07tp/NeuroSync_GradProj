@@ -1,0 +1,24 @@
+
+[T=64]  per-(dst,src-core) 롤백질량 분산 분해 + 예측기 R²
+   bin  nb |   eta2(정적%) ACFdem_all ACFdem_top80 |  R2_static R2_lastv R2_ewma  lift
+    16 121 |        3.0%      0.016        0.011 |      0.030   -0.909  -0.290  1.64   (top80=링크2196)
+    32  61 |        5.7%     -0.015       -0.023 |      0.057   -0.932  -0.294  1.32   (top80=링크2196)
+    64  31 |       10.5%     -0.033       -0.036 |      0.112   -1.003  -0.457  1.16   (top80=링크2196)
+   128  16 |       18.8%     -0.066       -0.063 |      0.198   -0.855  -0.349  1.07   (top80=링크2196)
+
+[T=128]  per-(dst,src-core) 롤백질량 분산 분해 + 예측기 R²
+   bin  nb |   eta2(정적%) ACFdem_all ACFdem_top80 |  R2_static R2_lastv R2_ewma  lift
+    16 121 |        2.9%      0.020        0.017 |      0.029   -0.901  -0.289  1.55   (top80=링크2255)
+    32  61 |        5.4%     -0.007       -0.012 |      0.055   -0.904  -0.286  1.31   (top80=링크2255)
+    64  31 |        9.9%     -0.090       -0.104 |      0.100   -0.983  -0.293  1.14   (top80=링크2255)
+   128  16 |       18.3%     -0.076       -0.072 |      0.187   -0.836  -0.301  1.02   (top80=링크2255)
+
+[saved] /home/heechan/26_GRADPROJ/NeuroSync_GradProj/result_img/stage4_temporal_autocorr.png
+
+[STEP3 해석 — 정직, 설계 변경 신호]
+ (1) within-pair demeaned ACF(all & top80% mass) ≈ 0(±0.0x, 음수도) → 링크 평균율을 빼면 롤백은 시간적으로 거의 white(Poisson). 고질량 링크만 봐도 동일 → false-negative 아님. *동적 history 예측력 ≈ 0*.
+ (2) eta²(정적 prior 가 설명하는 질량분산)는 fine scale 에서 *작다*: 16ts 3%, 32ts 6%, 64ts 10%, 128ts 19% (coarse 일수록 within-link 잡음이 평균되어 상승). per-advance stall 결정이 작동할 Δt≈35ts 영역에선 정적 prior 도 분산의 ~3-6% 만 설명.
+ (3) R2_lastval≈-0.9, R2_ewma≈-0.3 (음수=글로벌평균보다 나쁨) → per-link 롤백질량 시계열은 fine scale 에서 사실상 Poisson; 시계열 *forecasting* (last-value/2bit/EWMA, 로드맵 §4-2 가정) 프레이밍 자체가 약함. persistence lift>1·raw ACF 는 약한 정적 rate 이질성의 조건부선택 효과일 뿐(eta² 3% 와 정합). ISN 평활 캐스케이드와 일치.
+ (4) src-NEURON 은 R²·ACF 모두 더 약함 → STEP2 'per-core' 결론 유지(단, 동적 항 자체가 무력).
+[설계 함의 — 중대] 예측 대상을 '롤백 시계열 forecasting' 으로 보면 천장이 매우 낮다. 그러나 belatedness 의 진짜 결정요인은 *예측* 이 아니라 결정시점에 **결정론적으로 아는 상태**: (a) 현재 투기깊이(=advance 가 마지막 sync/chkpt 대비 몇 ts 앞섰나, 정확히 앎), (b) source 까지 NoC hop·inter-chip(정적, 앎), (c) 평균 도착지연 Δt(앎). 확률적 부분은 'source 가 취약창에서 발화했나'(spike-gen, 예측 안 함)뿐. → 예측기는 temporal forecaster 가 아니라 **기하/임계 horizon 정책**(투기깊이가 source 군의 도착지연 horizon 을 넘으면 stall)이어야 함. 로드맵 §5-2 의 '최근 belated 이력 온라인 학습' 비중은 과대평가.
+[A4 gate 재정의] STEP4 = 리드타임/Δt vs NoC 기하 분포(이 결정론 horizon 정책의 천장 측정). STEP5 = *horizon-stall 정책* 오프라인 리플레이를 1순위로 redo 천장(10.4/18.1%) 회수율 측정, history/forecaster 는 대조군(음수 예상).

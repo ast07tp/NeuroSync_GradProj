@@ -1,0 +1,35 @@
+========================================================================
+Stage 3 STEP3 — Oracle 3종 (brunel_si v1, primary block B=128 ts)
+========================================================================
+available fixed-T : [1, 2, 4, 8, 16, 32, 64, 128]
+intensity 가용 T  : [2, 4, 8, 16, 32, 64, 128]   blocks=15  final_ts=1970
+
+-- fixed-T 총사이클 (메트릭=로그 최종 누적 cyc) & 재구성 sanity --
+   T      total_cyc   recon(Σblk+warm)    err%  cyc/T16
+   1      9,891,914          9,891,914   0.00%   0.211x
+   2      5,743,497          5,743,497   0.00%   0.363x
+   4      3,654,443          3,654,443   0.00%   0.571x
+   8      2,602,320          2,602,320   0.00%   0.802x
+  16      2,087,560          2,087,560   0.00%   1.000x
+  32      1,854,170          1,854,170   0.00%   1.126x
+  64      1,808,130          1,808,130   0.00%   1.155x
+ 128      1,909,086          1,909,086   0.00%   1.093x
+
+-- Oracle 결과 --
+Oracle-B  전역단일최적T =  64        total =      1,808,130 cyc   speedup vs T16 = 1.1545x
+Oracle-A  per-block 포락선(상한)        total =      1,772,784 cyc   speedup vs T16 = 1.1776x | vs Oracle-B = 1.0199x
+Oracle-C  롤백예산 β*=755,549        total =      1,805,796 cyc   speedup vs T16 = 1.1560x | vs Oracle-B = 1.0013x
+
+  A–B gap (동적T 가 노릴 파이) = 35,346 cyc (1.95% of Oracle-B)
+  Oracle-C 가 회수한 gap 비율  = 6.6%  (롤백신호 기반 동적T = Stage4 가망성 지표)
+
+-- 핵심 질문 해석 --
+  Q1 A–B gap 유의? : Oracle-A 가 최적고정T 대비 1.0199x → 여지 작음(ISN 평활과 부합)
+  Q2 C 의 gap 회수 : 6.6% → 회수 미미
+  Q3 최적 고정 T   : 64 (T=16 대비 1.1545x) → baseline 재설정 권고
+
+-- robustness: 결정입도 B=64 ts --
+  Oracle-A(B64) speedup vs Oracle-B = 1.0361x  (B128 = 1.0199x)  | 더 잘게 자를수록 상한 느슨
+  Oracle-C(B64) total = 1,870,438 cyc  speedup vs T16 = 1.1161x
+
+[saved] /home/heechan/26_GRADPROJ/NeuroSync_GradProj/result_img/stage3_brunel_si_oracle_comparison.png

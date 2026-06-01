@@ -1,0 +1,42 @@
+======================================================================
+Stage4-energy — redo_cyc 분해 (rollback 부기 vs recovery/recompute)
+======================================================================
+
+[T=64]  total cyc = 118,060,416  (64-core sum)
+  ── redo_cyc 분해 (rollback_state) ──
+  redo_cyc (roll+recov)= 12,303,306  (10.42% of total)
+  ├ restore/bookkeeping= 557,942  (4.53% of redo, 0.47% of total)
+  └ recompute/recovery = 11,745,364  (95.47% of redo, 9.95% of total)
+  [check] restore+recompute == redo : True
+  [check] redo == 백업(비침습)        : True  (백업없음)
+  ── FSM 상태별 분해 (전체 cyc 어디로 가나) ──
+       neu_comp =     12,467,477  (10.56%)
+   neu_comp_end =      4,809,794  ( 4.07%)
+      sync_wait =      2,796,189  ( 2.37%)
+         commit =         10,287  ( 0.01%)
+      sync_done =     85,673,363  (72.57%)
+       rollback =     12,303,306  (10.42%)
+  [check] fsm[rollback] == redo_cyc : True
+  → 실연산(neu_comp+sync_done시냅스) ≈ 83.1%  | sync오버헤드(end+wait+commit) ≈ 6.5%  | rollback ≈ 10.4%
+
+[T=128]  total cyc = 126,515,008  (64-core sum)
+  ── redo_cyc 분해 (rollback_state) ──
+  redo_cyc (roll+recov)= 22,956,017  (18.14% of total)
+  ├ restore/bookkeeping= 584,976  (2.55% of redo, 0.46% of total)
+  └ recompute/recovery = 22,371,041  (97.45% of redo, 17.68% of total)
+  [check] restore+recompute == redo : True
+  [check] redo == 백업(비침습)        : True  (백업없음)
+  ── FSM 상태별 분해 (전체 cyc 어디로 가나) ──
+       neu_comp =     12,601,911  ( 9.96%)
+   neu_comp_end =      6,865,805  ( 5.43%)
+      sync_wait =      2,866,355  ( 2.27%)
+         commit =          8,382  ( 0.01%)
+      sync_done =     81,216,538  (64.20%)
+       rollback =     22,956,017  (18.14%)
+  [check] fsm[rollback] == redo_cyc : True
+  → 실연산(neu_comp+sync_done시냅스) ≈ 74.2%  | sync오버헤드(end+wait+commit) ≈ 7.7%  | rollback ≈ 18.1%
+
+[해석] redo_cyc 는 'rollback 행위'가 아니라 거의 전부 recovery/recompute.
+       즉 보고했던 10.4/18.1% 천장은 이미 rollback+recovery 합산값.
+
+[saved] /home/heechan/26_GRADPROJ/NeuroSync_GradProj/result_img/stage4_redo_decomp.png

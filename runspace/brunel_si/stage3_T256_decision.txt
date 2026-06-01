@@ -1,0 +1,24 @@
+================================================================
+Task1 — fixed T(1..256) + Oracle-A only + 글로벌 동적-T 판정
+================================================================
+[T=256 병리적] ts 1586/1971 에서 cyc 4,578,669 도달 후 rollback-explosion(100%CPU 63min, >31min/block 무진척)으로 비종료 → kill. total ≫ 모든 T, Oracle-A 후보서 제외(완료 T 만으로 포락선).
+
+    T      total_cyc   vs T=16   vs best
+    1      9,891,914    0.211x    0.183x
+    2      5,743,497    0.363x    0.315x
+    4      3,654,443    0.571x    0.495x
+    8      2,602,320    0.802x    0.695x
+   16      2,087,560    1.000x    0.866x
+   32      1,854,170    1.126x    0.975x
+   64      1,808,130    1.155x    1.000x  <== best (Oracle-B)
+  128      1,909,086    1.093x    0.947x
+
+Oracle-B 최적 고정 T = 64  (1,808,130 cyc)
+Oracle-A per-block 포락선 (T∈[1, 2, 4, 8, 16, 32, 64, 128], B=128) = 1,772,784 cyc
+Oracle-A vs 최적 고정 T  = 1.0199x  (= 1.99% 이득)
+
+>>> 판정: 글로벌 동적-T 깔끔히 포기 (≤5% — per-block 최적 T 라도 미미)
+>>> 대체 본선 = 코어별 speculative-advance + 예측 stall (측정 oracle 천장 T64=10.4%, T128=18.1%)
+
+[saved] /home/heechan/26_GRADPROJ/NeuroSync_GradProj/result_img/stage3_fixedT_total_cycles_with_T256.png
+[saved] /home/heechan/26_GRADPROJ/NeuroSync_GradProj/result_img/stage3_oracleA_only_comparison_T256.png

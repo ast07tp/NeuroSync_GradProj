@@ -1,0 +1,1 @@
+python3 Main.py /home/heechan/26_GRADPROJ/NeuroSync_GradProj/benchmark/brunel_si/dataset /home/heechan/26_GRADPROJ/NeuroSync_GradProj/mapping/brunel_si mapping_4100_64.npz hw_mapping_4100_64.npz 2 2 4 4 40 1 2 1971 10 50     #warmup before speculation: neuron network yet to be stabilized, rollback might explode > log 2> err&

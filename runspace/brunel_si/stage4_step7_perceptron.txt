@@ -1,0 +1,29 @@
+[T=64]  per-ts belated율=0.284 (base/majority 0.716)  ‖ 참고: per-(코어,T=64창) belated율=0.978 → 그 타겟은 vacuous, 그래서 per-ts 사용
+   H(=G)  acc(pw)   lift    AUC  (perceptron, local+global hist)
+       4    0.726 +0.009  0.540
+       8    0.725 +0.008  0.535
+      16    0.722 +0.006  0.539
+      32    0.720 +0.003  0.533
+      64    0.719 +0.003  0.541
+  kitchen-sink(H64+G64+remote-act): acc=0.719 lift=+0.002 AUC=0.541
+  baselines: 2-bit acc=0.693(lift -0.023) | AUC last-val=0.567  static-rate(CHEAT,상한)=0.523  perfect oracle=1.000
+  → perceptron AUC≈0.538(chance 0.5 바로 위, usable BP~0.95 에 한참 못 미침), majority 대비 acc lift≈+0.006 : majority 대비 무이득 + last-value 동급 → 예측 불가(확정)
+
+[T=128]  per-ts belated율=0.300 (base/majority 0.700)  ‖ 참고: per-(코어,T=128창) belated율=0.979 → 그 타겟은 vacuous, 그래서 per-ts 사용
+   H(=G)  acc(pw)   lift    AUC  (perceptron, local+global hist)
+       4    0.704 +0.004  0.570
+       8    0.705 +0.005  0.573
+      16    0.703 +0.003  0.579
+      32    0.702 +0.003  0.580
+      64    0.698 -0.002  0.583
+  kitchen-sink(H64+G64+remote-act): acc=0.699 lift=-0.001 AUC=0.585
+  baselines: 2-bit acc=0.693(lift -0.007) | AUC last-val=0.594  static-rate(CHEAT,상한)=0.520  perfect oracle=1.000
+  → perceptron AUC≈0.577(chance 0.5 바로 위, usable BP~0.95 에 한참 못 미침), majority 대비 acc lift≈+0.003 : majority 대비 무이득 + last-value 동급 → 예측 불가(확정)
+
+[saved] /home/heechan/26_GRADPROJ/NeuroSync_GradProj/result_img/stage4_perceptron.png
+
+[STEP7 판정 — 정직, 측정값 기반]
+ · 타겟 = *실제 advance 결정 단위*(per-dst-core,ts; belated율 T64 0.284 / T128 0.300, 비-degenerate). 정식 perceptron(per-entity weight + local+global history, float 무클립=이상화, online)을 H 4~64 + kitchen-sink(remote-activity)까지 스윕.
+ · 결과: **AUC ≈ 0.53–0.58** (chance 0.5 바로 위, usable BP ~0.95 에 한참 못 미침), **majority 대비 acc lift ≈ 0(±0.01)**. 2-bit·last-value 와 동급이며, *미래를 컨닝한* static-rate 상한(AUC≈0.52)도 무의미. 즉 AUC 가 0.5 '정확히'는 아니지만 **운영상 무이득**(thresholding 해도 majority 못 넘음).
+ · 그 사소한 AUC>0.5 의 정체 = Stage3 가 규명한 *약한 단거리 자기상관*(near-Poisson + 미세한 rate 이질성)뿐 → Stage5 에서 이미 FP:TP≈5–6 으로 stall 게이트에 쓰면 net ≤ 0 임을 입증한 그 신호. branch-prediction 비유의 *대표·최강 온라인 도구*조차 이걸 못 넘김 → rollback 비예측성은 **예측기 약함이 아니라 신호 부재** (Step3 Poisson·Step4 Δt⊥거리·Step6 정합).
+ · 부수 확인: per-(코어,T-window) belated율 ~0.97 = '발생 여부'는 거의 항상 yes(vacuous) → 가치는 '언제/어디'에 있는데 그게 Poisson. 포스터 (2) '직접 예측 불가' airtight. (A2 granularity 와 독립 — 여긴 예측 품질만 격리 측정.)

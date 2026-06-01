@@ -1,0 +1,21 @@
+기준선 Stage3 fixed-T=64 = 1,808,130  | base fixed-T=128 = 1,909,086
+redo 천장(stall-oracle, Stage3-B 확정) = redo_frac = 18.1% (redo_cyc 22,956,017, 64코어 합산 단위)
+>>> A4 통과 요건: T=128 base 에서 net 천장회수 ≥ 29.1% (=fixed-T=64 도달선). 사용자 ~10% 절대가속 기준이면 거의 천장 전부.
+
+무대 T=128, bin=16ts. (g=gross 천장회수, FP부담=불필요stall, net=g−FP부담; 절대가속≈net×18.1%)  k_rb(참고)=1.17
+  정책                         g%   FP부담%   net%     TP      FP  FP:TP    ~절대가속  vsT64
+  oracle-perfect         100.0%    0.0% 100.0%  50868       0    0.0   +18.1%  WIN
+  last-block(2-state)     15.7%   84.0% -68.3%   8059   42729    5.3   -12.4%  --
+  EWMA(a=.5,thr=0.2)      27.3%  159.9%-132.6%  13701   81341    5.9   -24.1%  --
+  EWMA(a=.5,thr=0.4)      16.6%   87.7% -71.1%   8515   44617    5.2   -12.9%  --
+  static-hot-link(prior)  75.8%  419.4%-343.6%  34446  213362    6.2   -62.3%  --
+
+해석: oracle=g100%·FP0 → net 100% → 절대가속 = 천장 18.1% (>29.1% 요건 → WIN, 단 완벽예측 전제). 실현 정책은 g 낮고 FP:TP≫1 → net ≤ 0(천장 회수 실패, 오히려 불필요 stall 로 latency 가산). Step3(시간≈0)·Step4(공간 무력)의 직접 귀결.
+
+[saved] /home/heechan/26_GRADPROJ/NeuroSync_GradProj/result_img/stage4_a4gate_replay.png
+
+[STEP5 / A4 gate 판정 — 정직]
+ · 요건: net 천장회수 ≥ 29% (T64 도달). oracle (완벽예측)만 충족 — 그러나 Step3(시간 forecasting≈0/음수)·Step4(공간 prior 무력, Δt⊥거리)가 그 예측 불가를 입증.
+ · 실현 정책(last-block/EWMA/static-prior): gross 회수 낮고 FP:TP≫1 → net ≤ 0. base T=128 도 못 줄이고 Stage3 fixed-T=64 최적도 당연히 못 이김.
+ · 근원: 글로벌 동적-T 를 폐기시킨 ISN 항상성(평활·균일·예측불가)이 per-core 축에서도 동일 작용. **latency A4 = FAIL**.
+ · 잔존 가치(미확정): TP 의 롤백(재계산+RR)→idle 치환은 *에너지* 절감일 수 있음(stall 내부비용은 trace 검증불가 → Step6 에서 전력모델로 별도 정량). 졸업연구를 'latency 음성 + 정직한 ISN 한계규명 + (가능시) energy-only 이득'으로 재정의할지 = 사용자 판단.

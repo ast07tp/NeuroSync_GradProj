@@ -1,0 +1,36 @@
+# Python virtual environment (절대 push 금지 — 의존성은 pip 으로 재설치)
+.venv/
+venv/
+env/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Cython 빌드 산출물 (재컴파일로 재생성)
+neurosync/build/
+neurosync/*.c
+neurosync/*.so
+neurosync/*.o
+
+# 본 연구 백업 파일
+*.bak
+*.bak_predecomp
+
+# OS / Editor
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# 큰 원시 trace (요약 .txt 만 push, raw .dat 는 시뮬 재실행으로 재현 가능)
+# 필요 시 아래 두 줄 주석 처리
+runspace/*/brunel_si_peri*/rollback_events.dat
+runspace/*/brunel_si_peri*/multicore_spike_out*.dat
+
+# 로컬 임시 zip 결과물 (재생성 가능)
+research_bundle.zip
+neurosync_paper_bundle.zip

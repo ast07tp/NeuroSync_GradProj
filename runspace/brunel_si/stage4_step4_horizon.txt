@@ -1,0 +1,60 @@
+
+[T=64]  events=278,971  Σdelta_t=9,865,953  (redo_frac 천장=10.42%, redo_cyc=12,303,306)
+  Δt: mean=35.4 med=34 max=64.0 | mass-CDF Δt@25/50/75/90% = 31/46/57/64
+   hop     n_ev  mean_Δt   mass% cum_mass%
+     0    4,423     34.5    1.5%      1.5%
+     1   14,486     36.0    5.3%      6.8%
+     2   26,093     35.6    9.4%     16.2%
+     3   33,948     35.2   12.1%     28.3%
+     4   37,010     35.5   13.3%     41.7%
+     5   37,373     35.4   13.4%     55.1%
+     6   35,579     35.6   12.9%     67.9%
+     7   30,708     35.0   10.9%     78.8%
+     8   24,319     35.2    8.7%     87.5%
+     9   15,507     36.0    5.7%     93.1%
+    10    9,620     34.3    3.3%     96.5%
+    11    5,641     35.2    2.0%     98.5%
+    12    2,540     35.4    0.9%     99.4%
+    13    1,351     33.7    0.5%     99.9%
+    14      373     35.8    0.1%    100.0%
+  inter-chip: mean_Δt=35.4 (mass 75%)  vs  intra=35.3 (mass 25%)  corr(hop,Δt)=-0.007
+  cap H=  8: 회수 redo=77.6% of Σ (= 8.09%p of total cyc; stall cyc=동량, rollback≫stall 에너지)
+  cap H= 16: 회수 redo=56.7% of Σ (= 5.91%p of total cyc; stall cyc=동량, rollback≫stall 에너지)
+  cap H= 32: 회수 redo=25.8% of Σ (= 2.69%p of total cyc; stall cyc=동량, rollback≫stall 에너지)
+  cap H= 48: 회수 redo= 7.4% of Σ (= 0.77%p of total cyc; stall cyc=동량, rollback≫stall 에너지)
+  [budget≈30%] uniform H=29 vs dist-aware H(hop): 동일 stall 예산서 회수 -6.4% → 정적 NoC prior 추가가치
+  [budget≈50%] uniform H=19 vs dist-aware H(hop): 동일 stall 예산서 회수 -1.5% → 정적 NoC prior 추가가치
+
+[T=128]  events=292,488  Σdelta_t=19,645,505  (redo_frac 천장=18.14%, redo_cyc=22,956,017)
+  Δt: mean=67.2 med=65 max=128.0 | mass-CDF Δt@25/50/75/90% = 64/92/116/127
+   hop     n_ev  mean_Δt   mass% cum_mass%
+     0    4,672     65.3    1.6%      1.6%
+     1   15,317     68.1    5.3%      6.9%
+     2   27,631     67.2    9.4%     16.3%
+     3   35,178     67.3   12.1%     28.4%
+     4   38,887     67.0   13.3%     41.6%
+     5   38,769     67.1   13.2%     54.9%
+     6   37,615     67.3   12.9%     67.8%
+     7   32,573     67.5   11.2%     79.0%
+     8   25,313     66.8    8.6%     87.6%
+     9   16,229     67.1    5.5%     93.1%
+    10   10,009     64.8    3.3%     96.4%
+    11    6,020     68.5    2.1%     98.5%
+    12    2,632     68.4    0.9%     99.4%
+    13    1,293     68.4    0.5%     99.9%
+    14      350     66.8    0.1%    100.0%
+  inter-chip: mean_Δt=67.1 (mass 75%)  vs  intra=67.3 (mass 25%)  corr(hop,Δt)=-0.002
+  cap H= 16: 회수 redo=76.5% of Σ (= 13.88%p of total cyc; stall cyc=동량, rollback≫stall 에너지)
+  cap H= 32: 회수 redo=56.2% of Σ (= 10.19%p of total cyc; stall cyc=동량, rollback≫stall 에너지)
+  cap H= 64: 회수 redo=26.1% of Σ (= 4.74%p of total cyc; stall cyc=동량, rollback≫stall 에너지)
+  cap H= 96: 회수 redo= 7.6% of Σ (= 1.39%p of total cyc; stall cyc=동량, rollback≫stall 에너지)
+  [budget≈30%] uniform H=59 vs dist-aware H(hop): 동일 stall 예산서 회수 -2.7% → 정적 NoC prior 추가가치
+  [budget≈50%] uniform H=38 vs dist-aware H(hop): 동일 stall 예산서 회수 -1.1% → 정적 NoC prior 추가가치
+
+[saved] /home/heechan/26_GRADPROJ/NeuroSync_GradProj/result_img/stage4_horizon_ceiling.png
+
+[STEP4 해석 — 정직, 누적 음성]
+ (1) Δt ⊥ NoC 기하: mean_Δt 가 hop 0–14 에서 평탄, corr(hop,Δt)≈0(-0.007/-0.002), inter-chip≈intra. dist-aware H(hop) 가 uniform 보다 *나쁨*(음수 gain). → 내가 STEP2 서 권장한 *정적 NoC link prior 는 이 워크로드에서 무력* (거리가 위험·깊이를 안 가름). 설계서 정적 link prior 항 제거가 정직.
+ (2) Δt ≈ T/2 (35@T64,67@T128, mass-CDF 도 그 부근) → 롤백깊이는 전송거리가 아니라 *sync 윈도 위치*가 지배. belatedness 의 구조적 예측핸들이 공간(거리)에 없음.
+ (3) uniform horizon-cap = 사실상 *effective T 재매개변수화*: H=8@T64 가 redo 77% 회수해도 그건 T_eff≈8 거동 = Stage3 U-곡선이 이미 '비싸다'고 판정한 영역(sync/chkpt 과다). 즉 cap 단독은 새 레버가 아니라 Stage3 가 최적화한 그 trade-off. 공짜 회수 아님.
+[종합] STEP3(시간 forecasting≈0/음수) + STEP4(공간 prior 무력, cap=재매개변수화) → 비선택적 stall 은 작은 T 와 동치(이미 열위). 이김은 *선택적* stall 만 가능한데 STEP3·4 가 싼 선택 신호 부재를 보임. 글로벌 동적-T 를 죽인 ISN 항상성(평활·균일·예측불가)이 per-core 축에도 동일 작용. STEP5 = 후보 선택정책을 오프라인 리플레이해 (회수 redo − stall − 재유입 sync) 의 net 을 Stage3 T=64 최적과 *정직 비교* → A4 gate(통과/down-scope) 확정.

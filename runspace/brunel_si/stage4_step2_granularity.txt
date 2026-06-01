@@ -1,0 +1,23 @@
+
+[T=64]  events=278,971  Σdelta_t(롤백질량)=9,865,953
+  granularity     n_act    effN Gini(ev) Gini(mass)  ev/act top10%mass
+  src-neuron       3797   441.8    0.825      0.824    73.5      80.3%
+  src-core           64    56.0    0.288      0.280  4358.9      18.7%
+  (src->dst)link   4081  3213.3    0.383      0.378    68.4      24.7%
+  dst-core fan-in(기여 src-core 수): mean=63.8 max=64 min=62  | 질량90% 커버 src-core mean=44.2 max=47 → per-core 상태 ≤64 entry/코어
+
+[T=128]  events=292,488  Σdelta_t(롤백질량)=19,645,505
+  granularity     n_act    effN Gini(ev) Gini(mass)  ev/act top10%mass
+  src-neuron       3877   608.1    0.769      0.797    75.4      77.1%
+  src-core           64    57.5    0.260      0.264  4570.1      18.0%
+  (src->dst)link   4095  3355.8    0.351      0.366    71.4      24.4%
+  dst-core fan-in(기여 src-core 수): mean=64.0 max=64 min=63  | 질량90% 커버 src-core mean=45.3 max=48 → per-core 상태 ≤64 entry/코어
+
+[saved] /home/heechan/26_GRADPROJ/NeuroSync_GradProj/result_img/stage4_granularity_concentration.png
+
+[STEP2 해석 — 정밀]
+ (1) src-neuron Gini(mass)≈0.82 = '높음'(집중). 단 이 집중은 belated 예측가능성이 아니라 Brunel 발화율 이질성(일부 뉴런이 더 자주 발화) — 즉 우리가 예측 안 하기로 한 spike-발생 편향(§5-1). 게다가 n_act≈3.8k·ev/act≈73(희소) → 뉴런별 history 는 잡음·약한 자기상관 = 예측기 부적합.
+ (2) src-core Gini≈0.27 = 거의 균일(effN 56~58/64), §4-1 victim 균일성과 정합 → 전 코어 고른 회수 필요(핫스팟 특화 불가). ev/act≈4.4k(수십~수백배 dense) = 중심극한 평활(spike CV0.95→예측가능 신호) → history 예측 양호. 상태=64 entry.
+ (3) (src→dst)link 은 n_act≈4.1k·ev/act≈70 으로 per-neuron 만큼 희소 → *동적* per-link 학습상태는 per-neuron 과 같은 잡음병. 따라서 link 차원은 *정적* prior(NoC hop/inter-chip; self-core 1.6%·inter-chip 74%)로만 써야 함 — 데이터가 'link prior 는 학습 아닌 정적'을 정량 입증.
+ (4) dst-core fan-in mean≈64·질량90% 커버≈45 src-core → per-core 상태 ≤64 entry/코어 = in-core SRAM 부합(§6-1).
+[결론] 상태/결정 = per-src-core (동적 history),  feature += 정적 (src→dst)link topological prior.  순수 per-neuron(잡음·상태폭증·spike-gen 추종)·동적 per-link(희소) 기각.
