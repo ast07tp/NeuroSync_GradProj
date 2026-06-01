@@ -34,3 +34,41 @@ runspace/*/brunel_si_peri*/multicore_spike_out*.dat
 # 로컬 임시 zip 결과물 (재생성 가능)
 research_bundle.zip
 neurosync_paper_bundle.zip
+
+# === Claude Project 첨부 위한 슬림화 (큰 산출물 제외) ===
+# 모두 시뮬 재실행으로 재현 가능. 요약 .txt 만 git 에 남김.
+
+# runspace 의 per-run 빌드 + raw trace
+runspace/*/brunel_si_peri*/build/
+runspace/*/brunel_si_peri*/__pycache__/
+runspace/*/brunel_si_peri*/log
+runspace/*/brunel_si_peri*/err
+runspace/*/brunel_si_peri*/state.dat
+runspace/*/brunel_si_peri*/rollback_events.dat
+runspace/*/brunel_si_peri*/multicore_spike_out_*.dat
+runspace/*/brunel_si_peri*/*.pyx
+runspace/*/brunel_si_peri*/*.pxd
+runspace/*/brunel_si_peri*/*.py
+runspace/*/brunel_si_peri*/*.so
+runspace/*/brunel_si_peri*/*.c
+runspace/*/brunel_si_peri*/used.cfg
+runspace/*/brunel_si_peri*/command.sh
+runspace/*/brunel_si_peri*/setup.py
+
+# 부수 워크로드 (본 연구 비핵심)
+runspace/brunel_si_v2/
+
+# 옛 워크로드 (본 연구 미사용)
+mapping/example1/
+benchmark/example1/
+
+# mapping 의 큰 중간 산출물 (작은 mapping_4100_64.npz 만 유지)
+mapping/brunel_si/hw_mapping_*.npz
+mapping/brunel_si/chip_simulation.graph
+mapping/brunel_si/*.npy
+mapping/brunel_si/*.metis
+
+# benchmark dataset raw (워크로드 .py 가 출처)
+benchmark/brunel_si/dataset/connection.npy
+benchmark/brunel_si/dataset/raw_input.npz
+benchmark/brunel_si/dataset/*.npy
