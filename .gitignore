@@ -59,8 +59,30 @@ runspace/*/brunel_si_peri*/setup.py
 runspace/brunel_si_v2/
 
 # 옛 워크로드 (본 연구 미사용)
+runspace/lazy/
+runspace/lazy_doubled_timestep/
+runspace/lazy_*/
 mapping/example1/
 benchmark/example1/
+
+# brunel_si 워크로드의 per-run 산출물 — keep 은 redo_cyc.dat / fsm_cyc.dat 만
+# (모든 .so, .c, .o, .pyx, .pxd, .py, log, raw .dat 는 시뮬 재실행으로 재현)
+runspace/brunel_si/brunel_si_peri*/
+runspace/brunel_si_specgate/brunel_si_peri*/*.so
+runspace/brunel_si_specgate/brunel_si_peri*/*.c
+runspace/brunel_si_specgate/brunel_si_peri*/*.pyx
+runspace/brunel_si_specgate/brunel_si_peri*/*.pxd
+runspace/brunel_si_specgate/brunel_si_peri*/*.py
+runspace/brunel_si_specgate/brunel_si_peri*/RRManager
+runspace/brunel_si_specgate/brunel_si_peri*/Core
+runspace/brunel_si_specgate/brunel_si_peri*/NoC
+runspace/brunel_si_specgate/brunel_si_peri*/Init
+runspace/brunel_si_specgate/brunel_si_peri*/Router
+runspace/brunel_si_specgate/brunel_si_peri*/Checkpoint
+runspace/brunel_si_specgate/brunel_si_peri*/Neuron
+runspace/brunel_si_specgate/brunel_si_peri*/EnumList*
+runspace/brunel_si_specgate/brunel_si_peri*/GlobalVars*
+runspace/brunel_si_specgate/brunel_si_peri*/Main*
 
 # mapping 의 큰 중간 산출물 (작은 mapping_4100_64.npz 만 유지)
 mapping/brunel_si/hw_mapping_*.npz

@@ -1,1 +1,0 @@
-python3 Main.py /home/heechan/26_GRADPROJ/NeuroSync_GradProj/benchmark/example1/dataset /home/heechan/26_GRADPROJ/NeuroSync_GradProj/mapping/example1 mapping_2080_64.npz hw_mapping_2080_64.npz 2 2 4 4 40 2 1 992 10 50 > log 2> err&
