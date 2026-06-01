@@ -72,3 +72,11 @@ mapping/brunel_si/*.metis
 benchmark/brunel_si/dataset/connection.npy
 benchmark/brunel_si/dataset/raw_input.npz
 benchmark/brunel_si/dataset/*.npy
+
+# === Claude Project 별도 첨부 / 새로 그릴 예정 ===
+# 포스터 + 양식 reference PDF — Claude Project 에 별도 업로드
+research/paper/
+# 그림 PNG/CSV — 논문 작성 시 새로 그릴 예정 (데이터 출처는 runspace/.../*.txt 에)
+research/result_img/
+# 매핑 데이터 자체 — 워크로드 정의 (brunel_workload.py) 와 코드만 참조하면 충분
+mapping/

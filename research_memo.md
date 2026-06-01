@@ -10,9 +10,14 @@
 
 ## 0. 사용 안내
 
-- **참조 양식**: `research/paper/BS_Thesis_share.pdf` 의 **목차/구성/페이지 분량
-  분배만** 전적으로 따른다. 내용(SpyKING CIRCUS 관련)은 절대 참고하지
-  않는다.
+- **참조 양식**: **`BS_Thesis_share.pdf` (Claude Project 에 별도 첨부됨)**
+  의 **목차/구성/페이지 분량 분배만** 전적으로 따른다. 내용(SpyKING
+  CIRCUS 관련)은 절대 참고하지 않는다.
+- **별도 첨부물** (repo 에 미포함, Claude Project 에 따로 업로드됨):
+  - `졸프포스터_정희찬_A1최종본.pdf` — 최종 포스터 (결론/narrative 일치 확인)
+  - `BS_Thesis_share.pdf` — 양식 reference (목차/구성만)
+  - 그림 PNG 들 (예전 result_img/) — 새 논문에서는 **새로 그린다**. 본
+    메모 §5 가 "그릴 그림 + 데이터 출처" 가이드 역할.
 - **참조 양식의 실측 목차** (사용자 직접 확인본):
   ```
   초록            i
@@ -86,8 +91,12 @@ NeuroSync_GradProj/                ← repo 루트
 │   ├── brunel_si/                 fixed-T sweep, Oracle 분석, Stage 4 step 출력
 │   └── brunel_si_specgate/        redo_cyc / fsm_cyc 정밀 측정 (T=64, T=128)
 │
-├── benchmark/brunel_si/           새 워크로드 (Brian2 기반)
-├── mapping/brunel_si/             Metis 매핑 (mapping_4100_64.npz)
+├── benchmark/brunel_si/           새 워크로드 정의 (Brian2 기반)
+│                                  ★ brunel_workload.py 가 가장 중요 (dt, 시간상수, E/I 비)
+│                                  (dataset/connection.npy 는 repo 미포함 — 재생성 가능)
+│
+├── (mapping/ 은 repo 미포함)      Metis 매핑 데이터는 별도 보관, 본 연구는
+│                                   코드 인용시 "Metis 64-core mapping" 텍스트만 사용
 │
 ├── example.cfg                    ← 수정 (brunel_si workload)
 ├── example_specgate.cfg           ← 신규 (redo_cyc 정밀 측정용)
@@ -96,15 +105,17 @@ NeuroSync_GradProj/                ← repo 루트
 ├── run_specgate.sh                ← 신규 (T=64/128 정밀 측정 runner)
 ├── run_T_sweep.sh                 ← 신규 (T=1..256 sweep runner)
 │
-└── research/                      본 연구의 모든 산출물 (코드·문서·그림)
+└── research/                      본 연구 산출물 (문서 + 분석 스크립트만)
     ├── STAGE4_FINDINGS.md         Stage 4 단일 진실원 (보조 reference)
     ├── outline.md                 영문 포스터 outline (보조)
     ├── STAGE3_*.md, MODIFICATIONS.md, research_roadmap.md
     ├── *.py  (14개)               분석/플롯 스크립트
-    ├── paper/
-    │   ├── 졸프포스터_정희찬_A1최종본.pdf   최종 포스터 (결론 reference)
-    │   └── BS_Thesis_share.pdf              양식 reference (목차/구조만)
-    └── result_img/                그림 PNG + CSV
+    │
+    ├── (paper/ 는 repo 미포함)    포스터·양식 PDF 는 Claude Project 에
+    │                              별도 업로드됨
+    └── (result_img/ 는 repo 미포함) 그림 PNG·CSV 는 미첨부. 논문 그림은
+                                    새로 그릴 예정. 그릴 그림 + 데이터
+                                    출처 가이드는 본 메모 §5 참고.
 ```
 
 ### 0.5.2 Baseline NeuroSync 에서 수정된 파일 (5개)
@@ -142,10 +153,13 @@ byte-identical 검증 통과 (시뮬 거동 무변화). 각 추가 위치엔 `[r
 
 ### 0.5.3 본 연구가 새로 추가한 파일 (그룹별)
 
-**(a) 워크로드 / 매핑** — 시뮬레이션 입력
-- `benchmark/brunel_si/brunel_workload.py` — Brunel SI 생성 (Brian2,
-  dt=0.1 ms, 4100 뉴런 = 3200 E + 800 I + 100 Poisson)
-- `mapping/brunel_si/mapping_4100_64.npz` — Metis 64-core 매핑
+**(a) 워크로드 정의** — 시뮬레이션 입력의 *명세*
+- `benchmark/brunel_si/brunel_workload.py` — **★ 핵심**. Brunel SI 정의:
+  dt=0.1 ms, 4100 뉴런 (3200 E + 800 I + 100 Poisson), 시간상수 (tau_mem=20ms,
+  tau_exc=5ms, tau_inh=10ms), 시냅스 지연 (D_DELAY=15ts=1.5ms),
+  STDP off. 논문 §2.2 평가환경 인용의 원천.
+- (매핑 데이터: `mapping/brunel_si/mapping_4100_64.npz` — repo 미포함.
+  논문 인용은 "Metis 64-core mapping" 텍스트만 사용)
 
 **(b) 설정 + 실행 스크립트**
 - `example_specgate.cfg` — `redo_cyc.dat` 출력용 설정 (specgate 변형)
@@ -180,14 +194,18 @@ byte-identical 검증 통과 (시뮬 거동 무변화). 각 추가 위치엔 `[r
 - `STAGE3_ORACLE_DESIGN.md`, `STAGE3_PLAN.md`, `MODIFICATIONS.md` — 작업 메모
 - `research_roadmap.md` — 로드맵 v2
 
-**(f) 그림 + CSV** — `research/result_img/`
-- `stage{2,3,4}_*.png` — 각 Stage 핵심 그림
-- `poster_proxy_unusable.png`, `stage4_redo_decomp.png` — anchor 그림
-- `proxy_temporal.csv`, `proxy_spatial.csv`, `dynamicT_per_block.csv` — PPT 차트 데이터
+**(f) 그림 + CSV** — *repo 미포함*. 논문 그림은 **새로 그릴 예정**.
+- 그림이 보여줘야 할 *내용* + *데이터 출처* 매핑은 본 메모 §5 인벤토리.
+- 데이터 출처: `runspace/brunel_si/stage{3,4}_*.txt` (분석 derivatives) +
+  `runspace/brunel_si_specgate/.../redo_cyc.dat`, `fsm_cyc.dat` (계측 원시값).
+- 분석 스크립트 (`research/stage4_predict.py`, `research/oracle_analysis.py`,
+  `research/analyze_redo_decomp.py` 등) 가 원본 그림을 어떻게 그렸는지
+  코드 reference 제공 — 새 그림 작성 시 데이터 처리 로직 참고.
 
-**(g) 포스터 + 양식 reference** — `research/paper/`
-- `졸프포스터_정희찬_A1최종본.pdf` — 최종 포스터 (논문 결론과 일치 확인)
-- `BS_Thesis_share.pdf` — **양식 reference (목차/구조만 참고, 내용 무관)**
+**(g) 포스터 + 양식 reference** — *repo 미포함, Claude Project 에 별도 업로드됨*.
+- `졸프포스터_정희찬_A1최종본.pdf` — 최종 포스터. 논문의 결론·narrative
+  가 포스터와 일치하는지 cross-check.
+- `BS_Thesis_share.pdf` — **양식 reference (목차/구조만 참고, 내용 무관)**.
 
 ### 0.5.4 파일 찾기 가이드
 
@@ -196,16 +214,16 @@ byte-identical 검증 통과 (시뮬 거동 무변화). 각 추가 위치엔 `[r
 | 찾는 것 | 위치 |
 |---|---|
 | 모든 수치의 출처 색인 | `research_memo.md` §4 표 |
-| 그림 인벤토리 + §-배치 권고 | `research_memo.md` §5 |
+| 그릴 그림 + 데이터 출처 가이드 | `research_memo.md` §5 (그림 PNG 는 repo 미포함, 새로 그림) |
 | 예상 심사 질문 + 방어 답변 | `research_memo.md` §6 |
 | 계측 위치 (line 번호) | 본 절의 §0.5.2 표 또는 `grep "\[research" neurosync/*.{pyx,py}` |
 | 시뮬 측정 원시값 | `runspace/brunel_si_specgate/.../{redo_cyc, fsm_cyc}.dat` |
 | Stage 별 분석 derivatives | `runspace/brunel_si/stage*.txt` |
-| 그림 PNG | `research/result_img/stage{2,3,4}_*.png` |
-| 포스터 결론 (consistency check) | `research/paper/졸프포스터_정희찬_A1최종본.pdf` |
-| 양식 reference (목차만!) | `research/paper/BS_Thesis_share.pdf` |
+| 워크로드 매개변수 (dt, τ, E/I 비) | `benchmark/brunel_si/brunel_workload.py` |
+| 포스터 결론 (consistency check) | **별도 첨부**: `졸프포스터_정희찬_A1최종본.pdf` |
+| 양식 reference (목차만!) | **별도 첨부**: `BS_Thesis_share.pdf` |
 | 시뮬레이터 코드 인용 (line 번호 포함) | `neurosync/*.{pyx,py}` |
-| 분석 스크립트 (재현 / 검증용) | `research/*.py` |
+| 분석 스크립트 (재현 / 그림 생성 로직 참고) | `research/*.py` |
 
 ---
 
@@ -743,7 +761,7 @@ NeuroSync, 롤백 예측, 억제안정화 네트워크, 한계 연구.
 - **결과**: Oracle-A 총합 = **1,772,784 cycle** = **+1.99%** speedup
   vs 고정 T=64 (`stage3_oracle_results.txt`).
   - 블록 입도 B=64 로 잘게 나눠도 +3.6%, 천장은 ~4% 에서 saturate.
-- **블록별 최적 T 시퀀스 (`research/result_img/dynamicT_per_block.csv`)**:
+- **블록별 최적 T 시퀀스** (재생성: `research/dump_dynamicT_csv.py`):
   `[128, 64, 32, 128, 64, 32, 64, 64, 64, 64, 128, 64, 64, 64, 64]`
   - 분포: T=64 가 10/15 (67%), T=128 이 3/15, T=32 가 2/15.
 - **핵심 narrative point — "최적 T 는 시간에 따라 바뀌지만 비용 차이가
@@ -998,36 +1016,44 @@ NeuroSync, 롤백 예측, 억제안정화 네트워크, 한계 연구.
 
 ---
 
-## 5. 그림 인벤토리 (논문 §-배치 안내)
+## 5. 그림 가이드 (그릴 그림 + 데이터 출처 + 분석 코드)
 
-모든 그림 `research/result_img/`. 포스터에 사용된 그림은 재사용, 일부는 thesis
-layout 에 맞춰 재작성.
+> **중요**: 그림 PNG 는 repo 에 포함되지 않는다. 논문 그림은 **새로 그릴
+> 예정**이다. 본 절은 (a) 어떤 그림이 어디에 배치되어야 하는지, (b) 각
+> 그림이 보여줘야 하는 *내용·메시지*, (c) 그릴 때 참고할 *데이터 출처*
+> 와 *분석 코드* 의 매핑이다.
+>
+> 별도 첨부된 **최종 포스터 PDF** 에 모든 원본 그림 12개가 들어 있어
+> 시각적 reference 로 활용 가능.
 
-| 파일명 | 내용 | 권장 § 위치 |
-|---|---|---|
-| (신규) 0-1-2-3 spine 트리 | 본론 anchor 도해 | §2.1 |
-| (신규) 한 sync period 타임라인 | 코어 내부 4단계 + barrier | §1.2 |
-| `stage4_redo_decomp.png` | FSM 6-state 분해 + redo 내부 분해 (이번 작업 산출) | §2.2 |
-| `stage2_brunel_si_rollback_intensity_T16_v1.png` | 롤백 강도 시계열 + cycle overlay | §2.2 또는 §2.4 |
-| (신규) 평활 캐스케이드 화살표 도해 (CV 0.95→0.40→0.16) | C2 ISN 시각화 | §3.1 |
-| `stage4_perceptron.png` | Perceptron H 스윕, AUC 0.53–0.58 | §2.3 |
-| `stage4_a4gate_replay.png` | A4 gate replay, only oracle passes | §2.3 |
-| `stage4_temporal_autocorr.png` | ACF dem ≈ 0, R²_lastval < 0 (Poisson 지문) | §2.3 또는 §3.1 |
-| `stage4_cause_diagnosis.png` | per-ts victim mass (7.5:1) | §2.3 |
-| `stage4_granularity_concentration.png` | 입도 분해 (per-src-core 가 옳음) | §2.3 |
-| `poster_proxy_unusable.png` | activity + distance proxy 결합 2-panel | §2.4 |
-| `stage2_brunel_si_rollback_vs_spike_scatter_T16_v1.png` | activity ↔ rollback scatter, R²=0.09 | §2.4 (좌) |
-| `stage4_horizon_ceiling.png` | Δt × NoC hop (평탄), horizon cap 분석 | §2.4 (우) |
-| `stage3_fixedT_total_cycles_with_T256.png` | U-curve + T=256 pathological | §2.5.1 |
-| `stage3_brunel_si_fixedT_total_cycles.png` | U-curve (T=256 제외 깔끔 버전) | §2.5.1 (alt) |
-| `stage3_oracleA_only_comparison_T256.png` | Oracle-A +1.99% | §2.5.2 |
-| (신규) per-block best T 막대 차트 | dynamicT_per_block.csv 시각화 | §2.5.2 |
-| `stage3_brunel_si_oracle_comparison.png` | Oracle A/B/C 비교 (보조) | §2.5.2 (선택) |
+| 그림 (논문에서 새로 작성) | 보여줘야 할 내용·메시지 | 데이터 출처 | 그릴 때 참고 코드 | 권장 § |
+|---|---|---|---|---|
+| 0-1-2-3 spine 트리 | 본론 anchor — 세 경로 모두 닫혔음 | (개념 도해) | (해당 없음, ASCII art 는 본 메모 §2 참조) | §2.1 |
+| 한 sync period 타임라인 | 코어 내부 4단계 + 동기 barrier | (개념 도해) | (해당 없음) | §1.2 |
+| FSM 6-state 분해 + redo 내부 분해 | rollback 10.4%/18.1%, recompute 95%+ | `runspace/brunel_si_specgate/.../fsm_cyc.dat`, `redo_cyc.dat` | `research/analyze_redo_decomp.py` | §2.2 |
+| 롤백 강도 시계열 + cycle overlay | 평활 캐스케이드 시각화 | `runspace/brunel_si/brunel_si_peri16_*/{clean,rollback_events}.dat` (raw, repo 미포함 — 재실행) | `research/plot_stage2.py` | §2.2 |
+| 평활 캐스케이드 화살표 도해 | CV 0.95 → 0.40 → 0.16 | `runspace/brunel_si/stage2_*.txt` 의 CV 수치 | (수치 박스로 본문 작성도 가능) | §3.1 |
+| Perceptron H 스윕 — AUC 0.53–0.58 | 직접 예측 실패 | `runspace/brunel_si/stage4_step7_perceptron.txt` | `research/stage4_predict.py` (step 7) | §2.3 |
+| A4 gate replay — only oracle passes | 실현 예측기 net 음수 | `runspace/brunel_si/stage4_step5_a4gate.txt` | `research/stage4_predict.py` (step 5) | §2.3 |
+| 시간 자기상관 — ACFdem ≈ 0 | Poisson 지문 (시간축 예측 불가) | `runspace/brunel_si/stage4_step3_autocorr.txt` | `research/stage4_predict.py` (step 3) | §2.3 / §3.1 |
+| per-ts victim mass — 7.5 : 1 | 입도 불일치 (C3 핵심) | `runspace/brunel_si/stage4_step6_cause.txt` | `research/stage4_predict.py` (step 6) | §2.3 |
+| 입도 분해 (per-src-core) | 옳은 단위 정당화 | `runspace/brunel_si/stage4_step2_granularity.txt` | `research/stage4_predict.py` (step 2) | §2.3 |
+| 활성도 vs 롤백 scatter — R²=0.09 | 활성도 proxy 무용 | (raw 16-ts trace, 재실행) | `research/plot_stage2.py`, `research/dump_proxy_csv.py` | §2.4 (좌) |
+| 거리 vs Δt — corr ≈ 0 | NoC 기하 무용 | `runspace/brunel_si/stage4_step4_horizon.txt` | `research/stage4_predict.py` (step 4), `research/plot_proxy_unusable.py` | §2.4 (우) |
+| activity + distance proxy 2-panel | 위 둘을 한 그림에 | 같음 | `research/plot_proxy_unusable.py` | §2.4 (대체) |
+| 고정 T sweep U-curve (T=256 포함) | U자형, T=64 최적, T=256 pathological | `runspace/brunel_si/SWEEP_total_cycles.txt`, `stage3_T256_decision.txt` | `research/plot_stage3_fixedT.py`, `research/stage3_T256_decision.py` | §2.5.1 |
+| Oracle-A 단독 +1.99% 비교 | dynamic T 천장 미미 | `runspace/brunel_si/stage3_oracle_results.txt` | `research/oracle_analysis.py` | §2.5.2 |
+| per-block best T 막대 차트 | 시간에 따라 최적 T 변동 but cost flat | `dynamicT_per_block.csv` (재생성 가능: `research/dump_dynamicT_csv.py`) | `research/dump_dynamicT_csv.py` | §2.5.2 |
+| Oracle A/B/C 비교 (보조) | 3종 oracle 의 천장 차이 | `runspace/brunel_si/stage3_oracle_results.txt` | `research/oracle_analysis.py` | §2.5.2 (선택) |
 
-**작성자 참고**: 포스터의 그림 12개 (`research/paper/졸프포스터_정희찬_A1최종본.pdf`)
-와 위 PNG 가 거의 1:1 대응. 새로 그릴 그림은 (a) 0-1-2-3 spine 트리,
-(b) 한 sync period 타임라인 — 두 개만 필수. 평활 캐스케이드 화살표
-도해는 옵션 (수치 박스로 본문 안에 넣어도 됨).
+**작성자 참고**:
+- 별도 첨부된 포스터 PDF 의 그림 12개와 위 표가 거의 1:1 대응. 새 그림을 그릴 때
+  포스터 그림을 시각적 reference 로 사용 가능 (스타일·라벨링·강조 포인트).
+- 분석 코드 (`research/*.py`) 의 plotting 부분에 데이터 가공 로직 + 라벨 텍스트가
+  들어있어 그대로 베이스로 활용 가능. 그림 *재계산* 은 raw .dat (re-simulate) 가
+  필요한 경우 외엔 가능 — 대부분은 summary `.txt` 만으로 충분.
+- **필수 그림 (must-have)**: redo+FSM 분해 (§2.2), perceptron AUC (§2.3),
+  proxy 2-panel (§2.4), U-curve (§2.5.1), Oracle-A 비교 (§2.5.2). 그 외는 보조.
 
 ---
 
@@ -1146,14 +1172,20 @@ layout 에 맞춰 재작성.
 | `research/dump_proxy_csv.py`, `research/dump_dynamicT_csv.py` | 포스터·논문용 CSV 추출 |
 
 데이터 파일 (스키마 간략):
-- `rollback_events.dat`: per-event `(spiked_ts, affecting_ts, Δt, src_pid, is_anti, rollback_gid)`. T=64: 278,971 events; T=128: 292,488 events.
-- `clean.dat`: per-neuron spike list, ts-sorted, anti-cancelled pairs 제거.
+
+**repo 에 포함됨** (Claude 가 직접 read 가능):
 - `redo_cyc.dat`: 코어별 `(ind, cyc, redo_cyc, restore, recompute)` 행 + TOTAL + DECOMP.
 - `fsm_cyc.dat`: 코어별 6-state 분해 + TOTAL + FRAC + CHECK.
-- `mapping_4100_64.npz`: Metis 출력, `node_list[core] = [gid, ...]`.
 - `runspace/brunel_si/SWEEP_total_cycles.txt`: fixed-T sweep 총합.
 - `runspace/brunel_si/stage3_oracle_results.txt`: Oracle 결과.
-- `runspace/brunel_si/stage4_step{2..7}_*.txt`: 단계별 출력.
+- `runspace/brunel_si/stage3_T256_decision.txt`: T=256 pathological 결과.
+- `runspace/brunel_si/stage4_step{2..7}_*.txt`: Stage 4 단계별 출력.
+- `runspace/brunel_si/stage4_redo_decomp.txt`: redo + FSM 분해.
+
+**repo 에 미포함** (시뮬 재실행으로 재현 가능, 본문 인용 불필요):
+- `rollback_events.dat`: per-event `(spiked_ts, affecting_ts, Δt, src_pid, is_anti, rollback_gid)`. T=64: 278,971 events; T=128: 292,488 events. **요약 .txt 가 모든 인용 가능 수치를 cover.**
+- `clean.dat`: per-neuron spike list, ts-sorted. 본문 인용 시엔 `brunel_workload.py` 의 spike rate 명세로 대체.
+- `mapping_4100_64.npz`: Metis 출력 `node_list[core] = [gid, ...]`. 본문 인용은 "Metis 64-core partition" 텍스트만 사용.
 
 ---
 
